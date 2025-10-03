@@ -16,6 +16,23 @@
       font-family: "游ゴシック", sans-serif;
     }
 
+    /* 封筒と手紙を前面に */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 10; /* ←前面 */
+    }
+    .overlay.active {
+      display: flex;
+    }
+
     .envelope {
       position: relative;
       width: 200px;
@@ -23,6 +40,7 @@
       background: #ff6f61;
       cursor: pointer;
       transition: transform 0.3s;
+      z-index: 11;
     }
 
     .envelope:hover {
@@ -40,7 +58,7 @@
       border-bottom: 60px solid #ff877b;
       transition: transform 0.5s;
       transform-origin: top;
-      z-index: 2;
+      z-index: 12;
     }
 
     .letter {
@@ -54,29 +72,14 @@
       box-sizing: border-box;
       transform: translateY(100%);
       transition: transform 0.8s;
-      z-index: 1;
+      z-index: 11;
     }
 
     .letter.open {
       transform: translateY(-120%);
     }
 
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.3);
-    }
-
-    .overlay.active {
-      display: flex;
-    }
-
+    /* ハートは後ろ側 */
     .hearts {
       position: fixed;
       top: 0;
@@ -85,6 +88,7 @@
       height: 100%;
       pointer-events: none;
       overflow: hidden;
+      z-index: 1; /* ←背景に */
     }
 
     .heart {
@@ -126,6 +130,7 @@
   </style>
 </head>
 <body>
+  <!-- 手紙と封筒 -->
   <div class="overlay" id="overlay">
     <div class="envelope" id="envelope">
       <div class="flap" id="flap"></div>
@@ -135,6 +140,8 @@
       </div>
     </div>
   </div>
+
+  <!-- ハートは背景 -->
   <div class="hearts" id="hearts"></div>
 
   <script>
@@ -157,7 +164,7 @@
         for (let i = 0; i < 10; i++) { // 1tickで10個 → 100個/秒
           createHeart();
         }
-      }, 100); // 0.1秒ごと
+      }, 100);
       setTimeout(() => clearInterval(heartInterval), 3000);
     });
 
@@ -170,27 +177,26 @@
       }
     });
 
-    // ハート生成関数
+    // ハート生成
     function createHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
 
-      // 出現位置（画面下ランダム）
       heart.style.left = Math.random() * window.innerWidth + "px";
       heart.style.bottom = "-30px";
 
-      // ランダムな速度と重力（アニメーション時間に反映）
       const duration = 2 + Math.random() * 3; // 2〜5秒
-      const horizontalMove = (Math.random() - 0.5) * 200; // 左右ランダム
+      const horizontalMove = (Math.random() - 0.5) * 200;
       heart.style.setProperty("--x", `${horizontalMove}px`);
       heart.style.animationDuration = duration + "s";
 
+      // サイズもランダムに
+      const scale = 0.5 + Math.random() * 1.5;
+      heart.style.transform = `scale(${scale}) rotate(45deg)`;
+
       heartsContainer.appendChild(heart);
 
-      // アニメーション終了で削除
-      setTimeout(() => {
-        heart.remove();
-      }, duration * 1000);
+      setTimeout(() => heart.remove(), duration * 1000);
     }
   </script>
 </body>
