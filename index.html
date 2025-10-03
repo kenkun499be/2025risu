@@ -15,7 +15,7 @@
       overflow: hidden;
     }
 
-    /* 封筒全体 */
+    /* 封筒 */
     .envelope {
       position: relative;
       width: 220px;
@@ -27,7 +27,6 @@
       z-index: 3;
     }
 
-    /* 封筒のフタ */
     .flap {
       position: absolute;
       top: 0;
@@ -42,7 +41,6 @@
       z-index: 4;
     }
 
-    /* 封筒の下部分 */
     .bottom {
       position: absolute;
       bottom: 0;
@@ -72,21 +70,23 @@
       transition: transform 0.6s ease;
       z-index: 3;
     }
+
     .letter h2 {
       margin: 0 0 10px;
       font-size: 18px;
       color: #ff4d6d;
     }
+
     .letter p {
       margin: 0;
       font-size: 14px;
       color: #333;
     }
 
-    /* アニメーション適用時 */
     .open .flap {
       transform: rotateX(180deg);
     }
+
     .open .letter {
       transform: translateY(0);
     }
@@ -102,6 +102,7 @@
       transition: opacity 0.3s ease;
       z-index: 5;
     }
+
     .overlay.active {
       opacity: 1;
       pointer-events: auto;
@@ -124,6 +125,7 @@
       z-index: 10;
       text-align: center;
     }
+
     .popup.active {
       opacity: 1;
       pointer-events: auto;
@@ -164,7 +166,6 @@
     const overlay = document.querySelector('.overlay');
     const popup = document.querySelector('.popup');
 
-    // 封筒クリックで開く
     envelope.addEventListener('click', () => {
       envelope.classList.add('open');
 
@@ -172,13 +173,14 @@
       let duration = 3000;
       let interval = 10;
       let elapsed = 0;
+
       let spawn = setInterval(() => {
-        for (let i = 0; i < 3; i++) createHeart(); // 1tickで複数生成
+        for (let i = 0; i < 3; i++) createHeart();
         elapsed += interval;
         if (elapsed >= duration) clearInterval(spawn);
       }, interval);
 
-      // 手紙拡大
+      // 手紙ポップアップ表示
       setTimeout(() => {
         overlay.classList.add('active');
         popup.classList.add('active');
@@ -192,7 +194,6 @@
       popup.classList.remove('active');
     });
 
-    // ハート生成
     function createHeart() {
       const heart = document.createElement('div');
       heart.classList.add('heart');
@@ -204,12 +205,13 @@
       heart.style.left = startX + 'px';
       heart.style.top = startY + 'px';
       heart.style.fontSize = (16 + Math.random() * 24) + 'px';
+      heart.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2); // 透明度ランダム
 
       document.body.appendChild(heart);
 
-      // ランダム速度
-      let vx = (Math.random() - 0.5) * 2; 
-      let vy = - (3 + Math.random() * 3);
+      // 飛ぶ強さを強く
+      let vx = (Math.random() - 0.5) * 4;  // 横方向 -2 ~ 2
+      let vy = - (5 + Math.random() * 5);  // 上方向 -5 ~ -10
       let gravity = 0.05 + Math.random() * 0.05;
 
       let x = 0, y = 0;
@@ -218,7 +220,6 @@
         x += vx;
         y += vy;
         vy += gravity;
-
         heart.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 
         if (startY + y < window.innerHeight) {
