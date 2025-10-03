@@ -188,15 +188,15 @@
     font-weight:bold;
   }
 
-  /* ポインター（三角形） */
+  /* ポインター（三角形）下向きに変更 */
   .pointer {
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-bottom: 25px solid #ff4d6d;
+    border-top: 25px solid #ff4d6d;
     position: absolute;
-    top: -25px;
+    bottom: -25px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 15;
@@ -320,7 +320,7 @@ function createHeart(){
 
 // ルーレット
 function startRoulette(present){
-  if(document.querySelector('.roulette-wrapper')) return; // 既にある場合は無視
+  if(document.querySelector('.roulette-wrapper')) return;
 
   const wrapper = document.createElement('div');
   wrapper.classList.add('roulette-wrapper');
@@ -347,7 +347,7 @@ function startRoulette(present){
   });
 
   let rotation = 0;
-  let target = 90*1; // ロバックスの位置
+  let target = 270; // ロバックスが上（ポインター下）にくる角度
   let speed = 30;
 
   function spin(){
