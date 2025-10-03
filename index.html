@@ -16,23 +16,7 @@
       font-family: "游ゴシック", sans-serif;
     }
 
-    /* 封筒と手紙を前面に */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 10; /* ←前面 */
-    }
-    .overlay.active {
-      display: flex;
-    }
-
+    /* ===== 封筒と手紙 ===== */
     .envelope {
       position: relative;
       width: 200px;
@@ -42,7 +26,6 @@
       transition: transform 0.3s;
       z-index: 11;
     }
-
     .envelope:hover {
       transform: scale(1.05);
     }
@@ -74,12 +57,28 @@
       transition: transform 0.8s;
       z-index: 11;
     }
-
     .letter.open {
       transform: translateY(-120%);
     }
 
-    /* ハートは後ろ側 */
+    /* ===== 開いたときにだけ出す背景 ===== */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 9;
+    }
+    .overlay.active {
+      display: flex;
+    }
+
+    /* ===== ハート演出 ===== */
     .hearts {
       position: fixed;
       top: 0;
@@ -88,9 +87,8 @@
       height: 100%;
       pointer-events: none;
       overflow: hidden;
-      z-index: 1; /* ←背景に */
+      z-index: 1;
     }
-
     .heart {
       position: absolute;
       width: 20px;
@@ -100,7 +98,6 @@
       animation: fall linear forwards;
       opacity: 0.8;
     }
-
     .heart::before,
     .heart::after {
       content: "";
@@ -110,16 +107,8 @@
       background: red;
       border-radius: 50%;
     }
-
-    .heart::before {
-      top: -10px;
-      left: 0;
-    }
-
-    .heart::after {
-      left: -10px;
-      top: 0;
-    }
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { left: -10px; top: 0; }
 
     @keyframes fall {
       to {
@@ -130,18 +119,19 @@
   </style>
 </head>
 <body>
-  <!-- 手紙と封筒 -->
-  <div class="overlay" id="overlay">
-    <div class="envelope" id="envelope">
-      <div class="flap" id="flap"></div>
-      <div class="letter" id="letter">
-        お誕生日おめでとう！<br>
-        これからもずっといっぱい話そうね！
-      </div>
+  <!-- 封筒は最初から見える -->
+  <div class="envelope" id="envelope">
+    <div class="flap" id="flap"></div>
+    <div class="letter" id="letter">
+      お誕生日おめでとう！<br>
+      これからもずっといっぱい話そうね！
     </div>
   </div>
 
-  <!-- ハートは背景 -->
+  <!-- 手紙開けた時だけ出る背景 -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ハート背景 -->
   <div class="hearts" id="hearts"></div>
 
   <script>
@@ -153,7 +143,7 @@
 
     let heartInterval;
 
-    // 封筒タップで開く
+    // 封筒クリックで開く
     envelope.addEventListener("click", () => {
       flap.style.transform = "rotateX(180deg)";
       letter.classList.add("open");
@@ -161,7 +151,7 @@
 
       // ハートを3秒間出し続ける
       heartInterval = setInterval(() => {
-        for (let i = 0; i < 10; i++) { // 1tickで10個 → 100個/秒
+        for (let i = 0; i < 10; i++) {
           createHeart();
         }
       }, 100);
@@ -169,12 +159,10 @@
     });
 
     // 画面外クリックで閉じる
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        flap.style.transform = "rotateX(0deg)";
-        letter.classList.remove("open");
-        overlay.classList.remove("active");
-      }
+    overlay.addEventListener("click", () => {
+      flap.style.transform = "rotateX(0deg)";
+      letter.classList.remove("open");
+      overlay.classList.remove("active");
     });
 
     // ハート生成
@@ -185,17 +173,15 @@
       heart.style.left = Math.random() * window.innerWidth + "px";
       heart.style.bottom = "-30px";
 
-      const duration = 2 + Math.random() * 3; // 2〜5秒
+      const duration = 2 + Math.random() * 3;
       const horizontalMove = (Math.random() - 0.5) * 200;
       heart.style.setProperty("--x", `${horizontalMove}px`);
       heart.style.animationDuration = duration + "s";
 
-      // サイズもランダムに
       const scale = 0.5 + Math.random() * 1.5;
       heart.style.transform = `scale(${scale}) rotate(45deg)`;
 
       heartsContainer.appendChild(heart);
-
       setTimeout(() => heart.remove(), duration * 1000);
     }
   </script>
