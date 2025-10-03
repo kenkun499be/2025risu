@@ -115,7 +115,6 @@
     user-select: none;
   }
 
-  /* 下スクロール用セクション */
   #bottom-section {
     height: 100vh;
     position: relative;
@@ -125,7 +124,6 @@
     align-items: center;
   }
 
-  /* 煙 */
   .smoke {
     width: 100px;
     height: 100px;
@@ -141,7 +139,6 @@
     100% { transform: translateY(-200px) scale(1); opacity: 0; }
   }
 
-  /* プレゼント */
   .present {
     width: 100px;
     height: 100px;
@@ -159,7 +156,6 @@
     user-select: none;
   }
 
-  /* ルーレット */
   .roulette-container {
     position: relative;
     margin-top: 20px;
@@ -184,7 +180,6 @@
     font-weight:bold;
   }
 
-  /* 上向きポインター */
   .pointer {
     width: 0;
     height: 0;
@@ -198,7 +193,6 @@
     z-index: 15;
   }
 
-  /* カード */
   .card {
     margin-top: 20px;
     width: 300px;
@@ -214,7 +208,6 @@
     color: #333;
   }
 
-  /* YouTube */
   .youtube-container {
     margin-top: 20px;
   }
@@ -222,7 +215,6 @@
 </head>
 <body>
 
-<!-- 封筒 -->
 <div class="envelope">
   <div class="flap"></div>
   <div class="bottom"></div>
@@ -238,22 +230,15 @@
   <p>これからもずっといっぱい話そうね！</p>
 </div>
 
-<!-- 下セクション -->
-<div id="bottom-section">
-  <!-- 煙とプレゼント、ルーレット、カード、YouTubeはJSで追加 -->
-</div>
+<div id="bottom-section"></div>
 
 <script>
 const envelope = document.querySelector('.envelope');
 const overlay = document.querySelector('.overlay');
-const popup = document.querySelector('.popup');
 const bottomSection = document.getElementById('bottom-section');
 
-// 封筒クリックで手紙開く + ハート
 envelope.addEventListener('click', () => {
   envelope.classList.add('open');
-
-  // ハート生成
   let duration = 3000;
   let interval = 10;
   let elapsed = 0;
@@ -265,19 +250,14 @@ envelope.addEventListener('click', () => {
 
   setTimeout(()=> {
     overlay.classList.add('active');
-    popup.classList.add('active');
   },800);
 });
 
-// 手紙閉じる → スクロール＆煙＋プレゼント
 overlay.addEventListener('click', () => {
   envelope.classList.remove('open');
   overlay.classList.remove('active');
-  popup.classList.remove('active');
-
   bottomSection.scrollIntoView({behavior:'smooth'});
 
-  // 煙
   for(let i=0;i<3;i++){
     let smoke = document.createElement('div');
     smoke.classList.add('smoke');
@@ -286,19 +266,15 @@ overlay.addEventListener('click', () => {
     setTimeout(()=>smoke.remove(),2000);
   }
 
-  // プレゼント
   if(!document.querySelector('.present')){
     let present = document.createElement('div');
     present.classList.add('present');
     present.textContent = '🎁';
     bottomSection.appendChild(present);
-
-    // クリックでルーレット開始
     present.addEventListener('click', ()=>startRoulette(present));
   }
 });
 
-// ハート生成関数
 function createHeart(){
   const heart = document.createElement('div');
   heart.classList.add('heart');
@@ -309,7 +285,6 @@ function createHeart(){
   heart.style.top=startY+'px';
   heart.style.fontSize=(16+Math.random()*24)+'px';
   heart.style.opacity=(0.5+Math.random()*0.5).toFixed(2);
-
   document.body.appendChild(heart);
 
   let vx=(Math.random()-0.5)*4;
@@ -318,9 +293,7 @@ function createHeart(){
   let x=0,y=0;
 
   function animate(){
-    x+=vx;
-    y+=vy;
-    vy+=gravity;
+    x+=vx; y+=vy; vy+=gravity;
     heart.style.transform=`translate3d(${x}px,${y}px,0)`;
     if(startY+y<window.innerHeight) requestAnimationFrame(animate);
     else heart.remove();
@@ -328,75 +301,60 @@ function createHeart(){
   animate();
 }
 
-// ルーレット
 function startRoulette(present){
   if(document.querySelector('.roulette-container')) return;
 
   const container = document.createElement('div');
   container.classList.add('roulette-container');
 
-  const roulette = document.createElement('div');
-  roulette.classList.add('roulette');
-
   const pointer = document.createElement('div');
   pointer.classList.add('pointer');
   container.appendChild(pointer);
 
+  const roulette = document.createElement('div');
+  roulette.classList.add('roulette');
+
   const items = ['プレゼントなし','ロバックス','愛情','結婚'];
+  const colors = ['#ff4d6d','#ff8fab','#ffb3c6','#ffc1d6'];
+
   items.forEach((item,index)=>{
     const slice = document.createElement('div');
     slice.classList.add('slice');
     slice.textContent=item;
     slice.style.transform=`rotate(${index*90}deg) translate(0,-100%)`;
-    slice.style.background=['#ff4d6d','#ff8fab','#ffb6c6','#ffc1d6'][index];
+    slice.style.background = colors[index];
     roulette.appendChild(slice);
   });
 
   container.appendChild(roulette);
   bottomSection.appendChild(container);
 
-  // 回転アニメーション
-  let rotation = 0;
-  let target = 45; // 左に45°傾けてロバックスを上
+  let rotation = 45; // 初期傾き45°
+  let target = 45 + 180; // 45°からさらに180°回転
   let speed = 30;
+
   function spin(){
     rotation += speed;
     speed *= 0.97;
-    if(rotation >= 360) rotation -=360;
-    roulette.style.transform=`rotate(${rotation}deg)`;
+    roulette.style.transform = `rotate(${rotation}deg)`;
     if(speed>0.5){
       requestAnimationFrame(spin);
     } else {
-      roulette.style.transform=`rotate(${target}deg)`;
-      showCardAndVideo();
+      roulette.style.transform = `rotate(${target}deg)`;
+
+      // 停止後にカードとYouTube
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.textContent = 'ABCD1234EFGH5678';
+      bottomSection.appendChild(card);
+
+      const youtube = document.createElement('div');
+      youtube.classList.add('youtube-container');
+      youtube.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/XxK5kphQuz4" frameborder="0" allowfullscreen></iframe>`;
+      bottomSection.appendChild(youtube);
     }
   }
   spin();
-}
-
-// カード＋動画表示
-function showCardAndVideo(){
-  if(!document.querySelector('.card')){
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.textContent = generateCode();
-    bottomSection.appendChild(card);
-
-    const yt = document.createElement('div');
-    yt.classList.add('youtube-container');
-    yt.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/XxK5kphQuz4" title="YouTube video" frameborder="0" allowfullscreen></iframe>`;
-    bottomSection.appendChild(yt);
-  }
-}
-
-// 16桁コード生成
-function generateCode(){
-  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for(let i=0;i<16;i++){
-    code += chars.charAt(Math.floor(Math.random()*chars.length));
-  }
-  return code;
 }
 </script>
 </body>
