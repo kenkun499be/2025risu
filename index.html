@@ -122,6 +122,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
   }
 
   /* 煙 */
@@ -156,15 +157,23 @@
     position: relative;
     z-index: 10;
     user-select: none;
+    margin-top: 20px;
   }
 
   /* ルーレット */
+  .roulette-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
   .roulette {
     width: 200px; height: 200px;
     border-radius: 50%;
     border: 5px solid #ff4d6d;
     position: relative;
-    margin-top: 20px;
     overflow: hidden;
   }
 
@@ -178,6 +187,26 @@
     color:white;
     font-weight:bold;
   }
+
+  /* ポインター（三角形） */
+  .pointer {
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 25px solid #ff4d6d;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+  }
+
+  /* ハイライト */
+  .slice.selected {
+    box-shadow: 0 0 20px 5px rgba(255,77,109,0.7);
+  }
+
 </style>
 </head>
 <body>
@@ -291,10 +320,21 @@ function createHeart(){
 
 // ルーレット
 function startRoulette(present){
-  if(document.querySelector('.roulette')) return; // 既にある場合は無視
+  if(document.querySelector('.roulette-wrapper')) return; // 既にある場合は無視
 
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('roulette-wrapper');
+  bottomSection.appendChild(wrapper);
+
+  // ポインター追加
+  const pointer = document.createElement('div');
+  pointer.classList.add('pointer');
+  wrapper.appendChild(pointer);
+
+  // ルーレット追加
   const roulette = document.createElement('div');
   roulette.classList.add('roulette');
+  wrapper.appendChild(roulette);
 
   const items = ['プレゼントなし','ロバックス','愛情','結婚'];
   items.forEach((item,index)=>{
@@ -306,21 +346,29 @@ function startRoulette(present){
     roulette.appendChild(slice);
   });
 
-  bottomSection.appendChild(roulette);
-
-  // 回転アニメーション
   let rotation = 0;
   let target = 90*1; // ロバックスの位置
-  let speed = 30; // 初速
+  let speed = 30;
+
   function spin(){
     rotation += speed;
-    speed *= 0.97; // 減速
+    speed *= 0.97;
     if(rotation >= 360) rotation -=360;
     roulette.style.transform=`rotate(${rotation}deg)`;
+
+    // 回転中ハイライト
+    const slices = roulette.querySelectorAll('.slice');
+    slices.forEach(slice => slice.classList.remove('selected'));
+    const selectedIndex = Math.floor(((rotation%360)/90 + 0.5)) % 4;
+    slices[selectedIndex].classList.add('selected');
+
     if(speed>0.5){
       requestAnimationFrame(spin);
     } else {
-      roulette.style.transform=`rotate(${target}deg)`; // 最終的にロバックス
+      // 停止位置
+      roulette.style.transform=`rotate(${target}deg)`;
+      slices.forEach(slice => slice.classList.remove('selected'));
+      slices[1].classList.add('selected'); // ロバックス固定ハイライト
     }
   }
   spin();
