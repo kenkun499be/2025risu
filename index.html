@@ -1,235 +1,330 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Happy Birthday</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #fef6e4;
-      font-family: "Hiragino Maru Gothic ProN", sans-serif;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<title>Happy Birthday</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Hiragino Maru Gothic ProN", sans-serif;
+    overflow-x: hidden;
+    background: #fef6e4;
+  }
 
-    /* 封筒 */
-    .envelope {
-      position: relative;
-      width: 220px;
-      height: 140px;
-      background: #ffb3c6;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      overflow: hidden;
-      z-index: 3;
-    }
+  /* 封筒 + 手紙部分（絶対変更なし） */
+  .envelope {
+    position: relative;
+    width: 220px;
+    height: 140px;
+    background: #ffb3c6;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    overflow: hidden;
+    z-index: 3;
+    margin: 100px auto;
+  }
 
-    .flap {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0;
-      height: 0;
-      border-left: 110px solid transparent;
-      border-right: 110px solid transparent;
-      border-bottom: 70px solid #ff8fab;
-      transform-origin: top;
-      transition: transform 0.5s ease;
-      z-index: 4;
-    }
+  .flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 110px solid transparent;
+    border-right: 110px solid transparent;
+    border-bottom: 70px solid #ff8fab;
+    transform-origin: top;
+    transition: transform 0.5s ease;
+    z-index: 4;
+  }
 
-    .bottom {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 0;
-      border-left: 110px solid transparent;
-      border-right: 110px solid transparent;
-      border-top: 70px solid #ff8fab;
-      z-index: 2;
-    }
+  .bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 110px solid transparent;
+    border-right: 110px solid transparent;
+    border-top: 70px solid #ff8fab;
+    z-index: 2;
+  }
 
-    /* 手紙 */
-    .letter {
-      position: absolute;
-      top: 20px;
-      left: 10px;
-      width: 200px;
-      height: 100px;
-      background: white;
-      border: 2px solid #ff8fab;
-      border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      text-align: center;
-      padding: 10px;
-      transform: translateY(100%);
-      transition: transform 0.6s ease;
-      z-index: 3;
-    }
+  .letter {
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    width: 200px;
+    height: 100px;
+    background: white;
+    border: 2px solid #ff8fab;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-align: center;
+    padding: 10px;
+    transform: translateY(100%);
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
 
-    .letter h2 {
-      margin: 0 0 10px;
-      font-size: 18px;
-      color: #ff4d6d;
-    }
+  .letter h2 { margin: 0 0 10px; font-size: 18px; color: #ff4d6d; }
+  .letter p { margin: 0; font-size: 14px; color: #333; }
 
-    .letter p {
-      margin: 0;
-      font-size: 14px;
-      color: #333;
-    }
+  .open .flap { transform: rotateX(180deg); }
+  .open .letter { transform: translateY(0); }
 
-    .open .flap {
-      transform: rotateX(180deg);
-    }
+  .overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.5);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+  }
 
-    .open .letter {
-      transform: translateY(0);
-    }
+  .overlay.active {
+    opacity:1; pointer-events:auto;
+  }
 
-    /* 背景の暗幕 */
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 5;
-    }
+  .popup {
+    position: fixed;
+    top:50%; left:50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width:300px; padding:20px;
+    background:white;
+    border:2px solid #ff8fab;
+    border-radius:10px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.3);
+    opacity:0;
+    pointer-events:none;
+    transition: all 0.4s ease;
+    z-index:10;
+    text-align:center;
+  }
 
-    .overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+  .popup.active {
+    opacity:1; pointer-events:auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
 
-    /* 手紙ポップアップ */
-    .popup {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      width: 300px;
-      padding: 20px;
-      background: white;
-      border: 2px solid #ff8fab;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.4s ease;
-      z-index: 10;
-      text-align: center;
-    }
+  .heart {
+    position: fixed;
+    color: #ff4d6d;
+    pointer-events: none;
+    z-index: 20;
+    will-change: transform;
+    user-select: none;
+  }
 
-    .popup.active {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translate(-50%, -50%) scale(1);
-    }
+  /* 下スクロール用セクション */
+  #bottom-section {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    /* ハート */
-    .heart {
-      position: fixed;
-      color: #ff4d6d;
-      pointer-events: none;
-      z-index: 20;
-      will-change: transform;
-      user-select: none;
-    }
-  </style>
+  /* 煙 */
+  .smoke {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(200,200,200,0.6) 0%, rgba(200,200,200,0) 70%);
+    border-radius: 50%;
+    animation: rise 2s forwards;
+    position: absolute;
+    bottom: 50px;
+  }
+
+  @keyframes rise {
+    0% { transform: translateY(0) scale(0.5); opacity: 0.8; }
+    100% { transform: translateY(-200px) scale(1); opacity: 0; }
+  }
+
+  /* プレゼント */
+  .present {
+    width: 100px;
+    height: 100px;
+    background: #ff8fab;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    user-select: none;
+  }
+
+  /* ルーレット */
+  .roulette {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 5px solid #ff4d6d;
+    position: relative;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+
+  .slice {
+    width: 50%; height: 50%;
+    position: absolute;
+    top:50%; left:50%;
+    transform-origin: 0% 0%;
+    text-align: center;
+    line-height: 2;
+    color:white;
+    font-weight:bold;
+  }
+</style>
 </head>
 <body>
-  <!-- 封筒 -->
-  <div class="envelope">
-    <div class="flap"></div>
-    <div class="bottom"></div>
-    <div class="letter">
-      <h2>お誕生日おめでとう！</h2>
-      <p>これからもずっといっぱい話そうね！</p>
-    </div>
-  </div>
 
-  <!-- 手紙拡大用 -->
-  <div class="overlay"></div>
-  <div class="popup">
+<!-- 封筒 -->
+<div class="envelope">
+  <div class="flap"></div>
+  <div class="bottom"></div>
+  <div class="letter">
     <h2>お誕生日おめでとう！</h2>
     <p>これからもずっといっぱい話そうね！</p>
   </div>
+</div>
 
-  <script>
-    const envelope = document.querySelector('.envelope');
-    const overlay = document.querySelector('.overlay');
-    const popup = document.querySelector('.popup');
+<div class="overlay"></div>
+<div class="popup">
+  <h2>お誕生日おめでとう！</h2>
+  <p>これからもずっといっぱい話そうね！</p>
+</div>
 
-    envelope.addEventListener('click', () => {
-      envelope.classList.add('open');
+<!-- 下セクション -->
+<div id="bottom-section">
+  <!-- 煙とプレゼントはJSで追加 -->
+</div>
 
-      // ハート大量生成（3秒間）
-      let duration = 3000;
-      let interval = 10;
-      let elapsed = 0;
+<script>
+const envelope = document.querySelector('.envelope');
+const overlay = document.querySelector('.overlay');
+const popup = document.querySelector('.popup');
+const bottomSection = document.getElementById('bottom-section');
 
-      let spawn = setInterval(() => {
-        for (let i = 0; i < 2; i++) createHeart();
-        elapsed += interval;
-        if (elapsed >= duration) clearInterval(spawn);
-      }, interval);
+// 封筒クリックで手紙開く + ハート
+envelope.addEventListener('click', () => {
+  envelope.classList.add('open');
 
-      // 手紙ポップアップ表示
-      setTimeout(() => {
-        overlay.classList.add('active');
-        popup.classList.add('active');
-      }, 800);
-    });
+  // ハート生成
+  let duration = 3000;
+  let interval = 10;
+  let elapsed = 0;
+  let spawn = setInterval(() => {
+    for(let i=0;i<2;i++) createHeart();
+    elapsed+=interval;
+    if(elapsed>=duration) clearInterval(spawn);
+  }, interval);
 
-    // 画面外クリックで閉じる
-    overlay.addEventListener('click', () => {
-      envelope.classList.remove('open');
-      overlay.classList.remove('active');
-      popup.classList.remove('active');
-    });
+  setTimeout(()=> {
+    overlay.classList.add('active');
+    popup.classList.add('active');
+  },800);
+});
 
-    function createHeart() {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.textContent = '❤';
+// 手紙閉じる → スクロール＆煙＋プレゼント
+overlay.addEventListener('click', () => {
+  envelope.classList.remove('open');
+  overlay.classList.remove('active');
+  popup.classList.remove('active');
 
-      // 出現位置（画面下からランダム）
-      const startX = Math.random() * window.innerWidth;
-      const startY = window.innerHeight - 20;
-      heart.style.left = startX + 'px';
-      heart.style.top = startY + 'px';
-      heart.style.fontSize = (16 + Math.random() * 24) + 'px';
-      heart.style.opacity = (0.5 + Math.random() * 0.5).toFixed(2); // 透明度ランダム
+  // 下にスクロール
+  bottomSection.scrollIntoView({behavior:'smooth'});
 
-      document.body.appendChild(heart);
+  // 煙
+  for(let i=0;i<3;i++){
+    let smoke = document.createElement('div');
+    smoke.classList.add('smoke');
+    smoke.style.left = (Math.random()*window.innerWidth/2+window.innerWidth/4)+'px';
+    bottomSection.appendChild(smoke);
+    setTimeout(()=>smoke.remove(),2000);
+  }
 
-      // 飛ぶ強さを強く
-      let vx = (Math.random() - 0.5) * 4;  // 横方向 -2 ~ 2
-      let vy = - (5 + Math.random() * 5);  // 上方向 -5 ~ -10
-      let gravity = 0.05 + Math.random() * 0.05;
+  // プレゼント
+  if(!document.querySelector('.present')){
+    let present = document.createElement('div');
+    present.classList.add('present');
+    present.textContent = '🎁';
+    bottomSection.appendChild(present);
 
-      let x = 0, y = 0;
+    // クリックでルーレット開始
+    present.addEventListener('click', ()=>startRoulette(present));
+  }
+});
 
-      function animate() {
-        x += vx;
-        y += vy;
-        vy += gravity;
-        heart.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+// ハート生成関数（下からランダムに飛ぶ）
+function createHeart(){
+  const heart = document.createElement('div');
+  heart.classList.add('heart');
+  heart.textContent='❤';
+  const startX = Math.random()*window.innerWidth;
+  const startY = window.innerHeight - 20;
+  heart.style.left=startX+'px';
+  heart.style.top=startY+'px';
+  heart.style.fontSize=(16+Math.random()*24)+'px';
+  heart.style.opacity=(0.5+Math.random()*0.5).toFixed(2);
 
-        if (startY + y < window.innerHeight) {
-          requestAnimationFrame(animate);
-        } else {
-          heart.remove();
-        }
-      }
-      animate();
+  document.body.appendChild(heart);
+
+  let vx=(Math.random()-0.5)*4;
+  let vy=- (5+Math.random()*5);
+  let gravity=0.05 + Math.random()*0.05;
+  let x=0,y=0;
+
+  function animate(){
+    x+=vx;
+    y+=vy;
+    vy+=gravity;
+    heart.style.transform=`translate3d(${x}px,${y}px,0)`;
+    if(startY+y<window.innerHeight) requestAnimationFrame(animate);
+    else heart.remove();
+  }
+  animate();
+}
+
+// ルーレット
+function startRoulette(present){
+  if(document.querySelector('.roulette')) return; // 既にある場合は無視
+
+  const roulette = document.createElement('div');
+  roulette.classList.add('roulette');
+
+  const items = ['プレゼントなし','ロバックス','愛情','結婚'];
+  items.forEach((item,index)=>{
+    const slice = document.createElement('div');
+    slice.classList.add('slice');
+    slice.textContent=item;
+    slice.style.transform=`rotate(${index*90}deg) translate(0,-100%)`;
+    slice.style.background=['#ff4d6d','#ff8fab','#ffb3c6','#ffc1d6'][index];
+    roulette.appendChild(slice);
+  });
+
+  bottomSection.appendChild(roulette);
+
+  // 回転アニメーション
+  let rotation = 0;
+  let target = 90*1; // ロバックスの位置
+  let speed = 30; // 初速
+  function spin(){
+    rotation += speed;
+    speed *= 0.97; // 減速
+    if(rotation >= 360) rotation -=360;
+    roulette.style.transform=`rotate(${rotation}deg)`;
+    if(speed>0.5){
+      requestAnimationFrame(spin);
+    } else {
+      roulette.style.transform=`rotate(${target}deg)`; // 最終的にロバックス
     }
-  </script>
+  }
+  spin();
+}
+</script>
 </body>
 </html>
