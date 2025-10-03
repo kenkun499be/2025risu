@@ -120,9 +120,9 @@
     height: 100vh;
     position: relative;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
   }
 
   /* 煙 */
@@ -157,15 +157,11 @@
     position: relative;
     z-index: 10;
     user-select: none;
-    margin-top: 20px;
   }
 
   /* ルーレット */
-  .roulette-wrapper {
+  .roulette-container {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     margin-top: 20px;
   }
 
@@ -188,7 +184,7 @@
     font-weight:bold;
   }
 
-  /* ポインター（三角形）下向き */
+  /* 上向きポインター */
   .pointer {
     width: 0;
     height: 0;
@@ -202,11 +198,26 @@
     z-index: 15;
   }
 
-  /* ハイライト */
-  .slice.selected {
-    box-shadow: 0 0 20px 5px rgba(255,77,109,0.7);
+  /* カード */
+  .card {
+    margin-top: 20px;
+    width: 300px;
+    height: 150px;
+    background: linear-gradient(45deg,#ffe4e1,#ffb6c1);
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-family: monospace;
+    color: #333;
   }
 
+  /* YouTube */
+  .youtube-container {
+    margin-top: 20px;
+  }
 </style>
 </head>
 <body>
@@ -229,7 +240,7 @@
 
 <!-- 下セクション -->
 <div id="bottom-section">
-  <!-- 煙とプレゼントはJSで追加 -->
+  <!-- 煙とプレゼント、ルーレット、カード、YouTubeはJSで追加 -->
 </div>
 
 <script>
@@ -266,6 +277,7 @@ overlay.addEventListener('click', () => {
 
   bottomSection.scrollIntoView({behavior:'smooth'});
 
+  // 煙
   for(let i=0;i<3;i++){
     let smoke = document.createElement('div');
     smoke.classList.add('smoke');
@@ -274,15 +286,19 @@ overlay.addEventListener('click', () => {
     setTimeout(()=>smoke.remove(),2000);
   }
 
+  // プレゼント
   if(!document.querySelector('.present')){
     let present = document.createElement('div');
     present.classList.add('present');
     present.textContent = '🎁';
     bottomSection.appendChild(present);
+
+    // クリックでルーレット開始
     present.addEventListener('click', ()=>startRoulette(present));
   }
 });
 
+// ハート生成関数
 function createHeart(){
   const heart = document.createElement('div');
   heart.classList.add('heart');
@@ -312,20 +328,19 @@ function createHeart(){
   animate();
 }
 
+// ルーレット
 function startRoulette(present){
-  if(document.querySelector('.roulette-wrapper')) return;
+  if(document.querySelector('.roulette-container')) return;
 
-  const wrapper = document.createElement('div');
-  wrapper.classList.add('roulette-wrapper');
-  bottomSection.appendChild(wrapper);
-
-  const pointer = document.createElement('div');
-  pointer.classList.add('pointer');
-  wrapper.appendChild(pointer);
+  const container = document.createElement('div');
+  container.classList.add('roulette-container');
 
   const roulette = document.createElement('div');
   roulette.classList.add('roulette');
-  wrapper.appendChild(roulette);
+
+  const pointer = document.createElement('div');
+  pointer.classList.add('pointer');
+  container.appendChild(pointer);
 
   const items = ['プレゼントなし','ロバックス','愛情','結婚'];
   items.forEach((item,index)=>{
@@ -333,34 +348,55 @@ function startRoulette(present){
     slice.classList.add('slice');
     slice.textContent=item;
     slice.style.transform=`rotate(${index*90}deg) translate(0,-100%)`;
-    slice.style.background=['#ff4d6d','#ff8fab','#ffb3c6','#ffc1d6'][index];
+    slice.style.background=['#ff4d6d','#ff8fab','#ffb6c6','#ffc1d6'][index];
     roulette.appendChild(slice);
   });
 
-  let rotation = 0;
-  let target = 270 - 45; // 左に45°傾けてロバックス上に
-  let speed = 30;
+  container.appendChild(roulette);
+  bottomSection.appendChild(container);
 
+  // 回転アニメーション
+  let rotation = 0;
+  let target = 45; // 左に45°傾けてロバックスを上
+  let speed = 30;
   function spin(){
     rotation += speed;
     speed *= 0.97;
     if(rotation >= 360) rotation -=360;
     roulette.style.transform=`rotate(${rotation}deg)`;
-
-    const slices = roulette.querySelectorAll('.slice');
-    slices.forEach(slice => slice.classList.remove('selected'));
-    const selectedIndex = Math.floor(((rotation%360)/90 + 0.5)) % 4;
-    slices[selectedIndex].classList.add('selected');
-
     if(speed>0.5){
       requestAnimationFrame(spin);
     } else {
       roulette.style.transform=`rotate(${target}deg)`;
-      slices.forEach(slice => slice.classList.remove('selected'));
-      slices[1].classList.add('selected');
+      showCardAndVideo();
     }
   }
   spin();
+}
+
+// カード＋動画表示
+function showCardAndVideo(){
+  if(!document.querySelector('.card')){
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.textContent = generateCode();
+    bottomSection.appendChild(card);
+
+    const yt = document.createElement('div');
+    yt.classList.add('youtube-container');
+    yt.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/XxK5kphQuz4" title="YouTube video" frameborder="0" allowfullscreen></iframe>`;
+    bottomSection.appendChild(yt);
+  }
+}
+
+// 16桁コード生成
+function generateCode(){
+  let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for(let i=0;i<16;i++){
+    code += chars.charAt(Math.floor(Math.random()*chars.length));
+  }
+  return code;
 }
 </script>
 </body>
