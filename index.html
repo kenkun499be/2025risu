@@ -204,6 +204,19 @@
 
     // 封筒クリックで開く
     envelope.addEventListener("click", () => {
+       // 手紙拡大
+      setTimeout(() => {
+        overlay.classList.add('active');
+        popup.classList.add('active');
+      }, 800);
+    });
+
+    // 画面外クリックで閉じる
+    overlay.addEventListener('click', () => {
+      envelope.classList.remove('open');
+      overlay.classList.remove('active');
+      popup.classList.remove('active');
+    });
       flap.style.transform = "rotateX(180deg)";
       letter.classList.add("open");
       overlay.classList.add("active");
