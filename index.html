@@ -119,17 +119,22 @@
   </style>
 </head>
 <body>
-  <!-- 封筒は最初から見える -->
-  <div class="envelope" id="envelope">
-    <div class="flap" id="flap"></div>
-    <div class="letter" id="letter">
-      お誕生日おめでとう！<br>
-      これからもずっといっぱい話そうね！
+<!-- 封筒 -->
+  <div class="envelope">
+    <div class="flap"></div>
+    <div class="bottom"></div>
+    <div class="letter">
+      <h2>お誕生日おめでとう！</h2>
+      <p>これからもずっといっぱい話そうね！</p>
     </div>
   </div>
 
-  <!-- 手紙開けた時だけ出る背景 -->
-  <div class="overlay" id="overlay"></div>
+  <!-- 手紙拡大用 -->
+  <div class="overlay"></div>
+  <div class="popup">
+    <h2>お誕生日おめでとう！</h2>
+    <p>これからもずっといっぱい話そうね！</p>
+  </div>
 
   <!-- ハート背景 -->
   <div class="hearts" id="hearts"></div>
