@@ -137,6 +137,7 @@
       pointer-events: none;
       z-index: 20;
       will-change: transform;
+      user-select: none;
     }
   </style>
 </head>
@@ -167,12 +168,12 @@
     envelope.addEventListener('click', () => {
       envelope.classList.add('open');
 
-      // 3秒間ハートを大量生成
-      let duration = 3000; // 3秒
-      let interval = 10;   // 0.01秒ごと
+      // ハート大量生成（3秒間）
+      let duration = 3000;
+      let interval = 10;
       let elapsed = 0;
       let spawn = setInterval(() => {
-        for (let i = 0; i < 2; i++) createHeart(); // 1tickで複数生成
+        for (let i = 0; i < 3; i++) createHeart(); // 1tickで複数生成
         elapsed += interval;
         if (elapsed >= duration) clearInterval(spawn);
       }, interval);
@@ -197,31 +198,30 @@
       heart.classList.add('heart');
       heart.textContent = '❤';
 
-      // 出現位置（画面下全体ランダム）
+      // 出現位置（画面下からランダム）
       const startX = Math.random() * window.innerWidth;
-      const startY = window.innerHeight;
+      const startY = window.innerHeight - 20;
       heart.style.left = startX + 'px';
       heart.style.top = startY + 'px';
       heart.style.fontSize = (16 + Math.random() * 24) + 'px';
 
       document.body.appendChild(heart);
 
-      // ランダム速度・方向
-      let vx = (Math.random() - 0.5) * 2; // 左右ランダム
-      let vy = - (3 + Math.random() * 3); // 上向き
+      // ランダム速度
+      let vx = (Math.random() - 0.5) * 2; 
+      let vy = - (3 + Math.random() * 3);
       let gravity = 0.05 + Math.random() * 0.05;
 
-      let x = startX;
-      let y = startY;
+      let x = 0, y = 0;
 
       function animate() {
         x += vx;
         y += vy;
         vy += gravity;
 
-        heart.style.transform = `translate(${x}px, ${y}px)`;
+        heart.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 
-        if (y < window.innerHeight) {
+        if (startY + y < window.innerHeight) {
           requestAnimationFrame(animate);
         } else {
           heart.remove();
