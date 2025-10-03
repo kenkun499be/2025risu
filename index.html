@@ -52,10 +52,10 @@
       border-left: 110px solid transparent;
       border-right: 110px solid transparent;
       border-top: 70px solid #ff8fab;
-      z-index: 2; /* 手紙より下にする */
+      z-index: 2;
     }
 
-    /* 手紙（封筒の中に格納） */
+    /* 手紙 */
     .letter {
       position: absolute;
       top: 20px;
@@ -107,7 +107,7 @@
       pointer-events: auto;
     }
 
-    /* 手紙が拡大表示されるポップアップ */
+    /* 手紙ポップアップ */
     .popup {
       position: fixed;
       top: 50%; left: 50%;
@@ -130,26 +130,13 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* ハートの基本スタイル */
+    /* ハート */
     .heart {
       position: fixed;
       color: #ff4d6d;
-      font-size: 20px;
-      animation: floatUp 3s linear forwards;
       pointer-events: none;
       z-index: 20;
-    }
-
-    /* ハートのアニメーション */
-    @keyframes floatUp {
-      0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-200px) scale(1.5) rotate(20deg);
-      }
+      will-change: transform;
     }
   </style>
 </head>
@@ -179,10 +166,17 @@
     // 封筒クリックで開く
     envelope.addEventListener('click', () => {
       envelope.classList.add('open');
-      // ハートを生成
-      for (let i = 0; i < 20; i++) {
+
+      // 3秒間ハートを生成し続ける
+      let duration = 3000; // 3秒
+      let interval = 150; // 0.15秒ごとに出す
+      let elapsed = 0;
+      let spawn = setInterval(() => {
         createHeart();
-      }
+        elapsed += interval;
+        if (elapsed >= duration) clearInterval(spawn);
+      }, interval);
+
       // 手紙拡大
       setTimeout(() => {
         overlay.classList.add('active');
@@ -197,20 +191,43 @@
       popup.classList.remove('active');
     });
 
-    // ハート生成関数
+    // ハート生成
     function createHeart() {
       const heart = document.createElement('div');
       heart.classList.add('heart');
       heart.textContent = '❤';
-      heart.style.left = Math.random() * window.innerWidth + 'px';
-      heart.style.top = (window.innerHeight - 50) + 'px';
+
+      // 初期位置（封筒あたり）
+      const startX = window.innerWidth / 2 + (Math.random() * 100 - 50);
+      const startY = window.innerHeight / 2;
+      heart.style.left = startX + 'px';
+      heart.style.top = startY + 'px';
       heart.style.fontSize = (20 + Math.random() * 20) + 'px';
+
       document.body.appendChild(heart);
 
-      // アニメーション終了後削除
-      setTimeout(() => {
-        heart.remove();
-      }, 3000);
+      // ランダムな速度・方向
+      let vx = (Math.random() - 0.5) * 2; // 横方向 -1〜1
+      let vy = - (2 + Math.random() * 2); // 上方向
+      let gravity = 0.05 + Math.random() * 0.05; // 重力
+
+      let x = startX;
+      let y = startY;
+
+      function animate() {
+        x += vx;
+        y += vy;
+        vy += gravity; // 重力で落下
+
+        heart.style.transform = `translate(${x}px, ${y}px)`;
+
+        if (y < window.innerHeight) {
+          requestAnimationFrame(animate);
+        } else {
+          heart.remove();
+        }
+      }
+      animate();
     }
   </script>
 </body>
