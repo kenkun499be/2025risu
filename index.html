@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Happy Birthday</title>
   <style>
     body {
@@ -11,12 +10,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #ffe4e1;
+      background: #fef6e4;
+      font-family: "Hiragino Maru Gothic ProN", sans-serif;
       overflow: hidden;
-      font-family: "游ゴシック", sans-serif;
     }
 
-    /* ===== 封筒と手紙 ===== */
     /* 封筒全体 */
     .envelope {
       position: relative;
@@ -132,48 +130,18 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* ===== ハート演出 ===== */
-    .hearts {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 1;
-    }
+    /* ハート */
     .heart {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: red;
-      transform: rotate(45deg);
-      animation: fall linear forwards;
-      opacity: 0.8;
-    }
-    .heart::before,
-    .heart::after {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: red;
-      border-radius: 50%;
-    }
-    .heart::before { top: -10px; left: 0; }
-    .heart::after { left: -10px; top: 0; }
-
-    @keyframes fall {
-      to {
-        transform: translate(var(--x), -120vh) rotate(720deg);
-        opacity: 0;
-      }
+      position: fixed;
+      color: #ff4d6d;
+      pointer-events: none;
+      z-index: 20;
+      will-change: transform;
     }
   </style>
 </head>
 <body>
-<!-- 封筒 -->
+  <!-- 封筒 -->
   <div class="envelope">
     <div class="flap"></div>
     <div class="bottom"></div>
@@ -190,21 +158,26 @@
     <p>これからもずっといっぱい話そうね！</p>
   </div>
 
-  <!-- ハート背景 -->
-  <div class="hearts" id="hearts"></div>
-
   <script>
-    const envelope = document.getElementById("envelope");
-    const flap = document.getElementById("flap");
-    const letter = document.getElementById("letter");
-    const overlay = document.getElementById("overlay");
-    const heartsContainer = document.getElementById("hearts");
-
-    let heartInterval;
+    const envelope = document.querySelector('.envelope');
+    const overlay = document.querySelector('.overlay');
+    const popup = document.querySelector('.popup');
 
     // 封筒クリックで開く
-    envelope.addEventListener("click", () => {
-       // 手紙拡大
+    envelope.addEventListener('click', () => {
+      envelope.classList.add('open');
+
+      // 3秒間ハートを大量生成
+      let duration = 3000; // 3秒
+      let interval = 10;   // 0.01秒ごと
+      let elapsed = 0;
+      let spawn = setInterval(() => {
+        for (let i = 0; i < 2; i++) createHeart(); // 1tickで複数生成
+        elapsed += interval;
+        if (elapsed >= duration) clearInterval(spawn);
+      }, interval);
+
+      // 手紙拡大
       setTimeout(() => {
         overlay.classList.add('active');
         popup.classList.add('active');
@@ -217,44 +190,44 @@
       overlay.classList.remove('active');
       popup.classList.remove('active');
     });
-      flap.style.transform = "rotateX(180deg)";
-      letter.classList.add("open");
-      overlay.classList.add("active");
-
-      // ハートを3秒間出し続ける
-      heartInterval = setInterval(() => {
-        for (let i = 0; i < 10; i++) {
-          createHeart();
-        }
-      }, 100);
-      setTimeout(() => clearInterval(heartInterval), 3000);
-    });
-
-    // 画面外クリックで閉じる
-    overlay.addEventListener("click", () => {
-      flap.style.transform = "rotateX(0deg)";
-      letter.classList.remove("open");
-      overlay.classList.remove("active");
-    });
 
     // ハート生成
     function createHeart() {
-      const heart = document.createElement("div");
-      heart.className = "heart";
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent = '❤';
 
-      heart.style.left = Math.random() * window.innerWidth + "px";
-      heart.style.bottom = "-30px";
+      // 出現位置（画面下全体ランダム）
+      const startX = Math.random() * window.innerWidth;
+      const startY = window.innerHeight;
+      heart.style.left = startX + 'px';
+      heart.style.top = startY + 'px';
+      heart.style.fontSize = (16 + Math.random() * 24) + 'px';
 
-      const duration = 2 + Math.random() * 3;
-      const horizontalMove = (Math.random() - 0.5) * 200;
-      heart.style.setProperty("--x", `${horizontalMove}px`);
-      heart.style.animationDuration = duration + "s";
+      document.body.appendChild(heart);
 
-      const scale = 0.5 + Math.random() * 1.5;
-      heart.style.transform = `scale(${scale}) rotate(45deg)`;
+      // ランダム速度・方向
+      let vx = (Math.random() - 0.5) * 2; // 左右ランダム
+      let vy = - (3 + Math.random() * 3); // 上向き
+      let gravity = 0.05 + Math.random() * 0.05;
 
-      heartsContainer.appendChild(heart);
-      setTimeout(() => heart.remove(), duration * 1000);
+      let x = startX;
+      let y = startY;
+
+      function animate() {
+        x += vx;
+        y += vy;
+        vy += gravity;
+
+        heart.style.transform = `translate(${x}px, ${y}px)`;
+
+        if (y < window.innerHeight) {
+          requestAnimationFrame(animate);
+        } else {
+          heart.remove();
+        }
+      }
+      animate();
     }
   </script>
 </body>
