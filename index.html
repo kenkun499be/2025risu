@@ -11,7 +11,7 @@
     background: #fef6e4;
   }
 
-  /* 封筒 */
+  /* 封筒 + 手紙 */
   .envelope {
     position: relative;
     width: 220px;
@@ -26,8 +26,10 @@
 
   .flap {
     position: absolute;
-    top: 0; left: 0;
-    width: 0; height: 0;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
     border-left: 110px solid transparent;
     border-right: 110px solid transparent;
     border-bottom: 70px solid #ff8fab;
@@ -38,19 +40,22 @@
 
   .bottom {
     position: absolute;
-    bottom: 0; left: 0;
-    width: 0; height: 0;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
     border-left: 110px solid transparent;
     border-right: 110px solid transparent;
     border-top: 70px solid #ff8fab;
     z-index: 2;
   }
 
-  /* 手紙 */
   .letter {
     position: absolute;
-    top: 20px; left: 10px;
-    width: 200px; height: 100px;
+    top: 20px;
+    left: 10px;
+    width: 200px;
+    height: 100px;
     background: white;
     border: 2px solid #ff8fab;
     border-radius: 6px;
@@ -68,7 +73,7 @@
   .open .flap { transform: rotateX(180deg); }
   .open .letter { transform: translateY(0); }
 
-  /* 背景の暗幕 */
+  /* 背景暗幕 */
   .overlay {
     position: fixed; top:0; left:0; width:100%; height:100%;
     background: rgba(0,0,0,0.5);
@@ -76,27 +81,42 @@
     transition: opacity 0.3s ease;
     z-index: 5;
   }
-  .overlay.active { opacity:1; pointer-events:auto; }
+
+  .overlay.active {
+    opacity:1; pointer-events:auto;
+  }
 
   /* 手紙ポップアップ */
   .popup {
-    position: fixed; top:50%; left:50%;
+    position: fixed;
+    top:50%; left:50%;
     transform: translate(-50%, -50%) scale(0.8);
     width:300px; padding:20px;
     background:white;
     border:2px solid #ff8fab;
     border-radius:10px;
     box-shadow:0 6px 20px rgba(0,0,0,0.3);
-    opacity:0; pointer-events:none;
+    opacity:0;
+    pointer-events:none;
     transition: all 0.4s ease;
-    z-index:10; text-align:center;
+    z-index:10;
+    text-align:center;
   }
+
   .popup.active {
     opacity:1; pointer-events:auto;
     transform: translate(-50%, -50%) scale(1);
   }
 
-  .heart { position: fixed; color: #ff4d6d; pointer-events: none; z-index: 20; will-change: transform; }
+  /* ハート */
+  .heart {
+    position: fixed;
+    color: #ff4d6d;
+    pointer-events: none;
+    z-index: 20;
+    will-change: transform;
+    user-select: none;
+  }
 
   #bottom-section {
     height: 100vh;
@@ -108,29 +128,92 @@
   }
 
   .smoke {
-    width: 100px; height: 100px;
+    width: 100px;
+    height: 100px;
     background: radial-gradient(circle, rgba(200,200,200,0.6) 0%, rgba(200,200,200,0) 70%);
     border-radius: 50%;
     animation: rise 2s forwards;
-    position: absolute; bottom: 50px;
+    position: absolute;
+    bottom: 50px;
   }
 
-  @keyframes rise { 0% { transform: translateY(0) scale(0.5); opacity: 0.8; } 100% { transform: translateY(-200px) scale(1); opacity: 0; } }
+  @keyframes rise {
+    0% { transform: translateY(0) scale(0.5); opacity: 0.8; }
+    100% { transform: translateY(-200px) scale(1); opacity: 0; }
+  }
 
   .present {
-    width: 100px; height: 100px; background: #ff8fab;
+    width: 100px;
+    height: 100px;
+    background: #ff8fab;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    display: flex; justify-content: center; align-items: center;
-    font-size: 24px; color: white; cursor: pointer; position: relative; z-index: 10; user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    user-select: none;
   }
 
-  .roulette-container { position: relative; margin-top: 20px; }
-  .roulette { width: 200px; height: 200px; border-radius: 50%; border:5px solid #ff4d6d; position: relative; overflow: hidden; }
-  .slice { width:50%; height:50%; position:absolute; top:50%; left:50%; transform-origin:0% 0%; text-align:center; line-height:2; color:white; font-weight:bold; }
-  .pointer { width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:25px solid #ff4d6d; position:absolute; top:-25px; left:50%; transform:translateX(-50%); z-index:15; }
-  .card { margin-top: 20px; width: 300px; height: 150px; background: linear-gradient(45deg,#ffe4e1,#ffb6c1); border-radius:15px; box-shadow:0 6px 20px rgba(0,0,0,0.3); display:flex; justify-content:center; align-items:center; font-size:20px; font-family:monospace; color:#333; }
-  .youtube-container { margin-top:20px; }
+  .roulette-container {
+    position: relative;
+    margin-top: 20px;
+  }
+
+  .roulette {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 5px solid #ff4d6d;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slice {
+    width: 50%; height: 50%;
+    position: absolute;
+    top:50%; left:50%;
+    transform-origin: 0% 0%;
+    text-align: center;
+    line-height: 2;
+    color:white;
+    font-weight:bold;
+  }
+
+  .pointer {
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #ff4d6d;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+  }
+
+  .card {
+    margin-top: 20px;
+    width: 300px;
+    height: 150px;
+    background: linear-gradient(45deg,#ffe4e1,#ffb6c1);
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-family: monospace;
+    color: #333;
+  }
+
+  .youtube-container {
+    margin-top: 20px;
+  }
 </style>
 </head>
 <body>
@@ -155,13 +238,12 @@
 <script>
 const envelope = document.querySelector('.envelope');
 const overlay = document.querySelector('.overlay');
-const popup = document.querySelector('.popup');
 const bottomSection = document.getElementById('bottom-section');
 
 envelope.addEventListener('click', () => {
   envelope.classList.add('open');
 
-  // ハート生成
+  // ハート生成（下から上）
   let duration = 3000;
   let interval = 10;
   let elapsed = 0;
@@ -171,21 +253,20 @@ envelope.addEventListener('click', () => {
     if(elapsed>=duration) clearInterval(spawn);
   }, interval);
 
-  // 手紙拡大表示
   setTimeout(()=> {
     overlay.classList.add('active');
-    popup.classList.add('active');
+    document.querySelector('.popup').classList.add('active');
   },800);
 });
 
-// 手紙閉じる → スクロール＆煙＋プレゼント
 overlay.addEventListener('click', () => {
   envelope.classList.remove('open');
   overlay.classList.remove('active');
-  popup.classList.remove('active');
+  document.querySelector('.popup').classList.remove('active');
 
   bottomSection.scrollIntoView({behavior:'smooth'});
 
+  // 煙
   for(let i=0;i<3;i++){
     let smoke = document.createElement('div');
     smoke.classList.add('smoke');
@@ -194,6 +275,7 @@ overlay.addEventListener('click', () => {
     setTimeout(()=>smoke.remove(),2000);
   }
 
+  // プレゼント
   if(!document.querySelector('.present')){
     let present = document.createElement('div');
     present.classList.add('present');
@@ -203,44 +285,45 @@ overlay.addEventListener('click', () => {
   }
 });
 
-// ハート生成
 function createHeart(){
   const heart = document.createElement('div');
   heart.classList.add('heart');
   heart.textContent='❤';
-  const startX = window.innerWidth/2 + (Math.random()*100-50);
-  const startY = window.innerHeight/2;
+  const startX = Math.random()*window.innerWidth;
+  const startY = window.innerHeight - 20;
   heart.style.left=startX+'px';
   heart.style.top=startY+'px';
-  heart.style.fontSize=(20+Math.random()*20)+'px';
+  heart.style.fontSize=(16+Math.random()*24)+'px';
+  heart.style.opacity=(0.5+Math.random()*0.5).toFixed(2);
   document.body.appendChild(heart);
 
-  let vx=(Math.random()-0.5)*2;
-  let vy=-(2+Math.random()*2);
+  let vx=(Math.random()-0.5)*4;
+  let vy=- (5+Math.random()*5);
   let gravity=0.05 + Math.random()*0.05;
-  let x=startX, y=startY;
+  let x=0,y=0;
 
   function animate(){
     x+=vx; y+=vy; vy+=gravity;
-    heart.style.transform=`translate(${x}px, ${y}px)`;
-    if(y<window.innerHeight) requestAnimationFrame(animate);
+    heart.style.transform=`translate3d(${x}px,${y}px,0)`;
+    if(startY+y<window.innerHeight) requestAnimationFrame(animate);
     else heart.remove();
   }
   animate();
 }
 
-// ルーレット
 function startRoulette(present){
   if(document.querySelector('.roulette-container')) return;
 
   const container = document.createElement('div');
   container.classList.add('roulette-container');
+
   const pointer = document.createElement('div');
   pointer.classList.add('pointer');
   container.appendChild(pointer);
 
   const roulette = document.createElement('div');
   roulette.classList.add('roulette');
+
   const items = ['プレゼントなし','ロバックス','愛情','結婚'];
   const colors = ['#ff4d6d','#ff8fab','#ffb3c6','#ffc1d6'];
 
@@ -256,18 +339,20 @@ function startRoulette(present){
   container.appendChild(roulette);
   bottomSection.appendChild(container);
 
-  let rotation = 45; // 初期傾き
-  let target = 45 + 180; // さらに180°回転
+  let rotation = 45; // 初期傾き45°
+  let target = 45 + 180; // 45°からさらに180°回転
   let speed = 30;
 
   function spin(){
     rotation += speed;
     speed *= 0.97;
     roulette.style.transform = `rotate(${rotation}deg)`;
-    if(speed>0.5) requestAnimationFrame(spin);
-    else {
+    if(speed>0.5){
+      requestAnimationFrame(spin);
+    } else {
       roulette.style.transform = `rotate(${target}deg)`;
-      // 停止後カードとYouTube
+
+      // 停止後にカードとYouTube
       const card = document.createElement('div');
       card.classList.add('card');
       card.textContent = 'ABCD1234EFGH5678';
