@@ -175,7 +175,7 @@
       let elapsed = 0;
 
       let spawn = setInterval(() => {
-        for (let i = 0; i < 3; i++) createHeart();
+        for (let i = 0; i < 2; i++) createHeart();
         elapsed += interval;
         if (elapsed >= duration) clearInterval(spawn);
       }, interval);
